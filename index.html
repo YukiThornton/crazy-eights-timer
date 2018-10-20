@@ -1,0 +1,90 @@
+<!-- development version, includes helpful console warnings -->
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+<!-- production version, optimized for size and speed -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+
+<div id="app">
+    <template v-if="!started">
+        <p>
+            Crazy <input v-model.number="maxSprintCount" type="number"/>s
+        </p>
+        <p>
+            <input v-model.number="ideationSeconds" type="number"/> seconds to ideate
+        </p>
+        <p>
+            <input v-model.number="breakSeconds" type="number"/> seconds to take a breath
+        </p>
+        <p>
+            <input type="button" value="Go!" @click="start">
+        </p>
+    </template>
+    <template v-if="started">
+        <p>
+            <input type="button" value="Stop" @click="stop">
+        </p>
+        <p>
+            <p>
+                Sprint Count: {{ sprintCount }}
+            </p>
+            <p v-if="isIdeationTime">
+                Ideate!
+            </p>
+            <p v-if="!isIdeationTime">
+                Take a breath...
+            </p>
+            <p>
+                Remaining Time: {{ remainingSeconds }} seconds
+            </p>
+        </p>
+    </template>
+</div>
+
+<script>
+const app = new Vue({
+    el: '#app',
+    data: {
+        maxSprintCount: 8,
+        ideationSeconds: 30,
+        breakSeconds: 10,
+        started: false,
+        isIdeationTime: true,
+        remainingSeconds: -1,
+        sprintCount: 1,
+        timer: null,
+    },
+    methods: {
+        start: function() {
+            this.sprintCount = 1;
+            this.isIdeationTime = true;
+            this.remainingSeconds = this.ideationSeconds;
+            this.started = true;
+            this.timer = setInterval(this.countdown, 1000)
+        },
+        stop: function() {
+            this.started = false;
+            clearInterval(this.timer);
+            this.timer = null;
+        },
+        countdown: function() {
+            if (this.remainingSeconds === 0) {
+                this.switchTimers();
+                return;
+            }
+            this.remainingSeconds--;
+        },
+        switchTimers: function() {
+            if (this.isIdeationTime) {
+                if(this.sprintCount === this.maxSprintCount) {
+                    this.stop();
+                    return;
+                }
+            } else {
+                this.sprintCount++;
+            }
+            this.isIdeationTime = !this.isIdeationTime;
+            this.remainingSeconds = this.isIdeationTime? this.ideationSeconds: this.breakSeconds;
+        }
+    }
+})
+</script>
