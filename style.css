@@ -61,6 +61,11 @@ button:hover {
 	background: rgba(255, 255, 255, 0.9);
 }
 
+.sound-switch {
+	/* font-size: 100px; */
+	cursor: pointer;
+}
+
 .start-button {
 	color: #748970;
 }

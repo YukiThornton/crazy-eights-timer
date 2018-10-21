@@ -6,17 +6,23 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <!-- production version, optimized for size and speed -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.15/howler.core.min.js"></script>
 
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css?family=KoHo" rel="stylesheet">
-    <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet"> -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
     <title>Crazy Eights Timer</title>
   </head>
   <body>
     <div id="app" class="full-size">
       <div v-if="!started" class="full-size setting-page main-page-color">
-        <h2>Crazy {{maxSprintCount}}s Timer</h2>
+        <h2>
+          <span>Crazy {{maxSprintCount}}s Timer</span>
+          <i class="material-icons sound-switch" @click="switchSoundSetting">
+            {{soundOn? 'volume_up': 'volume_off'}}
+          </i>
+        </h2>
         <div class="input-area">
           <div>
             <div class="input-box">
@@ -51,10 +57,13 @@
       </div>
       <div v-if="started" :class="['full-size', 'timer-page', isIdeationTime ? 'ideation-color' : 'break-color']">
         <h2>
-          <span v-if="isIdeationTime">Make an idea!</span>
+          <span v-if="isIdeationTime">Make the {{sprintCountOrdinal}} idea!</span>
           <span v-if="!isIdeationTime">Take a breath...</span>
-          ({{ sprintCount }})
+          <i class="material-icons sound-switch" @click="switchSoundSetting">
+            {{soundOn? 'volume_up': 'volume_off'}}
+          </i>
         </h2>
+        <h3 v-if="!isIdeationTime">{{remainingSprintCount > 1 ? remainingSprintCount + " ideas": remainingSprintCount + " idea"}} to go!</h3>
         <div class="countdown-timer">
             {{ remainingSeconds }}
         </div>
@@ -75,6 +84,26 @@
           remainingSeconds: -1,
           sprintCount: 1,
           timer: null,
+          countdownSounds: null,
+          soundOn: false,
+        },
+        computed: {
+          sprintCountOrdinal: function() {
+            return this.getOrdinal(this.sprintCount);
+          },
+          remainingSprintCount: function() {
+            return this.maxSprintCount - this.sprintCount;
+          }
+        },
+        created: function() {
+          this.countdownSounds = {
+            tick: new Howl({
+              src: ['./countdown1.mp3']
+            }),
+            finish: new Howl({
+              src: ['./countdown2.mp3']
+            })
+          };
         },
         methods: {
           start: function() {
@@ -95,6 +124,15 @@
               return;
             }
             this.remainingSeconds--;
+            if (!this.soundOn) {
+              return;
+            }
+            if (this.remainingSeconds <= 3 && this.remainingSeconds > 0) {
+              this.countdownSounds.tick.play();
+            }
+            if (this.remainingSeconds === 0) {
+              this.countdownSounds.finish.play();
+            }
           },
           switchTimers: function() {
             if (this.isIdeationTime) {
@@ -107,6 +145,14 @@
             }
             this.isIdeationTime = !this.isIdeationTime;
             this.remainingSeconds = this.isIdeationTime? this.ideationSeconds: this.breakSeconds;
+          },
+          switchSoundSetting: function() {
+            this.soundOn = !this.soundOn;
+          },
+          getOrdinal: function(n) {
+            const s= ["th","st","nd","rd"];
+            const v = n % 100;
+            return n+(s[(v-20)%10]||s[v]||s[0]);
           }
         }
       })
