@@ -1,90 +1,115 @@
-<!-- development version, includes helpful console warnings -->
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <!-- development version, includes helpful console warnings -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- production version, optimized for size and speed -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
 
-<!-- production version, optimized for size and speed -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
-
-<div id="app">
-    <template v-if="!started">
-        <p>
-            Crazy <input v-model.number="maxSprintCount" type="number"/>s
-        </p>
-        <p>
-            <input v-model.number="ideationSeconds" type="number"/> seconds to ideate
-        </p>
-        <p>
-            <input v-model.number="breakSeconds" type="number"/> seconds to take a breath
-        </p>
-        <p>
-            <input type="button" value="Go!" @click="start">
-        </p>
-    </template>
-    <template v-if="started">
-        <p>
-            <input type="button" value="Stop" @click="stop">
-        </p>
-        <p>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css?family=KoHo" rel="stylesheet">
+    <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"> -->
+    <title>Crazy Eights Timer</title>
+  </head>
+  <body>
+    <div id="app" class="full-size">
+      <div v-if="!started" class="full-size setting-page main-page-color">
+        <h2>Crazy {{maxSprintCount}}s Timer</h2>
+        <div class="input-area">
+          <div>
+            <div class="input-box">
+              <p>
+                <input v-model.number="ideationSeconds" type="number"/>sec
+              </p>
+              <p>
+                <small>for </small><b>ideation</b>
+              </p>
+            </div>
+            <div class="input-box">
+              <p>
+                <input v-model.number="breakSeconds" type="number"/>sec
+              </p>
+              <p>
+                <small>for a </small><b>break</b>
+              </p>
+            </div>  
+          </div>
+          <div class="input-box">
             <p>
-                Sprint Count: {{ sprintCount }}
-            </p>
-            <p v-if="isIdeationTime">
-                Ideate!
-            </p>
-            <p v-if="!isIdeationTime">
-                Take a breath...
+              <input v-model.number="maxSprintCount" type="number"/>
             </p>
             <p>
-                Remaining Time: {{ remainingSeconds }} seconds
+              <b>times</b>
             </p>
-        </p>
-    </template>
-</div>
-
-<script>
-const app = new Vue({
-    el: '#app',
-    data: {
-        maxSprintCount: 8,
-        ideationSeconds: 30,
-        breakSeconds: 10,
-        started: false,
-        isIdeationTime: true,
-        remainingSeconds: -1,
-        sprintCount: 1,
-        timer: null,
-    },
-    methods: {
-        start: function() {
+          </div>
+        </div>
+        <div>
+          <button @click="start" class="start-button"><p>Start</p></button>
+        </div>
+      </div>
+      <div v-if="started" :class="['full-size', 'timer-page', isIdeationTime ? 'ideation-color' : 'break-color']">
+        <h2>
+          <span v-if="isIdeationTime">Make an idea!</span>
+          <span v-if="!isIdeationTime">Take a breath...</span>
+          ({{ sprintCount }})
+        </h2>
+        <div class="countdown-timer">
+            {{ remainingSeconds }}
+        </div>
+        <div>
+          <button @click="stop" :class="isIdeationTime ? 'exit-button-ideation' : 'exit-button-break'"><p>Exit</p></button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const app = new Vue({
+        el: '#app',
+        data: {
+          maxSprintCount: 8,
+          ideationSeconds: 30,
+          breakSeconds: 10,
+          started: false,
+          isIdeationTime: true,
+          remainingSeconds: -1,
+          sprintCount: 1,
+          timer: null,
+        },
+        methods: {
+          start: function() {
             this.sprintCount = 1;
             this.isIdeationTime = true;
             this.remainingSeconds = this.ideationSeconds;
             this.started = true;
             this.timer = setInterval(this.countdown, 1000)
-        },
-        stop: function() {
+          },
+          stop: function() {
             this.started = false;
             clearInterval(this.timer);
             this.timer = null;
-        },
-        countdown: function() {
+          },
+          countdown: function() {
             if (this.remainingSeconds === 0) {
-                this.switchTimers();
-                return;
+              this.switchTimers();
+              return;
             }
             this.remainingSeconds--;
-        },
-        switchTimers: function() {
+          },
+          switchTimers: function() {
             if (this.isIdeationTime) {
-                if(this.sprintCount === this.maxSprintCount) {
-                    this.stop();
-                    return;
-                }
+              if(this.sprintCount === this.maxSprintCount) {
+                this.stop();
+                return;
+              }
             } else {
-                this.sprintCount++;
+              this.sprintCount++;
             }
             this.isIdeationTime = !this.isIdeationTime;
             this.remainingSeconds = this.isIdeationTime? this.ideationSeconds: this.breakSeconds;
+          }
         }
-    }
-})
-</script>
+      })
+    </script>
+  </body>
+</html>
