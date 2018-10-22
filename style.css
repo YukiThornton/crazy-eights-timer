@@ -95,7 +95,7 @@ button:hover {
 	width: 100%;
 	display: flex;
 	flex-flow: row nowrap;
-	justify-content: center;
+	justify-content: flex-start;
 	align-items: center;
 	text-align: center;
 }
@@ -130,6 +130,10 @@ button:hover {
 	width: 50%;
 	height: 100%;
 	overflow: hidden;
+	display: inline-flex;
+	flex-flow: column nowrap;
+	justify-content: center;
+	align-items: center;
 }
 
 img {
