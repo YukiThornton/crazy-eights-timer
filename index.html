@@ -16,7 +16,7 @@
   </head>
   <body>
     <div id="app" class="full-size">
-      <div v-if="!started" class="full-size setting-page main-page-color">
+      <div v-if="!started" class="setting-page main-page-color">
         <h2>
           <span>Crazy {{maxSprintCount}}s Timer</span>
           <i class="material-icons sound-switch" @click="switchSoundSetting">
@@ -55,20 +55,25 @@
           <button @click="start" class="start-button"><p>Start</p></button>
         </div>
       </div>
-      <div v-if="started" :class="['full-size', 'timer-page', isIdeationTime ? 'ideation-color' : 'break-color']">
-        <h2>
-          <span v-if="isIdeationTime">Make the {{sprintCountOrdinal}} idea!</span>
-          <span v-if="!isIdeationTime">Take a breath...</span>
-          <i class="material-icons sound-switch" @click="switchSoundSetting">
-            {{soundOn? 'volume_up': 'volume_off'}}
-          </i>
-        </h2>
-        <h3 v-if="!isIdeationTime">{{remainingSprintCount > 1 ? remainingSprintCount + " ideas": remainingSprintCount + " idea"}} to go!</h3>
-        <div class="countdown-timer">
+      <div v-if="started" :class="['timer-page', isIdeationTime ? 'ideation-color' : 'break-color']">
+        <div class="timer-page-left">
+          <h2>
+            <span v-if="isIdeationTime">Make the {{sprintCountOrdinal}} idea!</span>
+            <span v-if="!isIdeationTime">Take a breath...</span>
+            <i class="material-icons sound-switch" @click="switchSoundSetting">
+              {{soundOn? 'volume_up': 'volume_off'}}
+            </i>
+          </h2>
+          <h3 v-if="!isIdeationTime">{{remainingSprintCount > 1 ? remainingSprintCount + " ideas": remainingSprintCount + " idea"}} to go!</h3>
+          <div class="countdown-timer">
             {{ remainingSeconds }}
+          </div>
+          <div>
+            <button @click="stop" :class="isIdeationTime ? 'exit-button-ideation' : 'exit-button-break'"><p>Exit</p></button>
+          </div>
         </div>
-        <div>
-          <button @click="stop" :class="isIdeationTime ? 'exit-button-ideation' : 'exit-button-break'"><p>Exit</p></button>
+        <div v-if="!isIdeationTime" class="timer-page-right">
+          <img :src="pictureUrls[nextPictureIndex]"/>
         </div>
       </div>
     </div>
@@ -86,6 +91,8 @@
           timer: null,
           countdownSounds: null,
           soundOn: false,
+          pictureUrls: [],
+          nextPictureIndex: 0,
         },
         computed: {
           sprintCountOrdinal: function() {
@@ -95,7 +102,7 @@
             return this.maxSprintCount - this.sprintCount;
           }
         },
-        created: function() {
+        created: async function() {
           this.countdownSounds = {
             tick: new Howl({
               src: ['./countdown1.mp3']
@@ -104,6 +111,7 @@
               src: ['./countdown2.mp3']
             })
           };
+          await this.getPictures();
         },
         methods: {
           start: function() {
@@ -142,6 +150,7 @@
               }
             } else {
               this.sprintCount++;
+              this.nextPictureIndex++; // TODO: check max length
             }
             this.isIdeationTime = !this.isIdeationTime;
             this.remainingSeconds = this.isIdeationTime? this.ideationSeconds: this.breakSeconds;
@@ -153,9 +162,27 @@
             const s= ["th","st","nd","rd"];
             const v = n % 100;
             return n+(s[(v-20)%10]||s[v]||s[0]);
+          },
+          getPictures: async function() {
+            const urls = await fetch('https://www.reddit.com/r/aww/hot/.json?limit=50')
+            .then(res => res.json())
+            .then(json => {
+              return json.data.children.filter(child => {
+                return child.data.url != null && child.data.url.endsWith('.jpg');
+              })
+              .map(child => child.data.url);
+            });
+            this.pictureUrls = shuffle(urls);
           }
         }
-      })
+      });
+      const shuffle = function(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      }
     </script>
   </body>
 </html>

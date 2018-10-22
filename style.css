@@ -19,13 +19,11 @@ html, body {
 .ideation-color {
 	background-color: #fffbd1;
 	color: #918e80;
-	/* border-color: #fffef4; */
 }
 
 .break-color {
 	background-color: #d1f4ff;
 	color: #80969e;
-	/* border-color: #dae5e8; */
 }
 
 input[type="number"] {
@@ -62,7 +60,6 @@ button:hover {
 }
 
 .sound-switch {
-	/* font-size: 100px; */
 	cursor: pointer;
 }
 
@@ -84,13 +81,23 @@ button:hover {
 }
 
 .setting-page {
+	height: 100%;
+	width: 100%;
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: center;
+	align-items: center;
 	text-align: center;
-	padding-top: 10vmin;
 }
 
 .timer-page {
+	height: 100%;
+	width: 100%;
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: center;
+	align-items: center;
 	text-align: center;
-	padding-top: 10vmin;
 }
 
 .input-area {
@@ -113,4 +120,18 @@ button:hover {
 .countdown-timer {
 	font-size: 35vmin;
 	margin: 2vmin 0;
+}
+
+.timer-page-left {
+	width: 50%;
+}
+
+.timer-page-right {
+	width: 50%;
+	height: 100%;
+	overflow: hidden;
+}
+
+img {
+	width: 100%;
 }
