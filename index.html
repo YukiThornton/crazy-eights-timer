@@ -19,9 +19,7 @@
       <div v-if="!started" class="setting-page main-page-color">
         <h2>
           <span>Crazy {{maxSprintCount}}s Timer</span>
-          <i class="material-icons sound-switch" @click="switchSoundSetting">
-            {{soundOn? 'volume_up': 'volume_off'}}
-          </i>
+          <sound-switch :sound-on="soundOn" @switch-sound-setting="switchSoundSetting"></sound-switch>
         </h2>
         <div class="input-area">
           <div>
@@ -60,9 +58,7 @@
           <h2>
             <span v-if="isIdeationTime">Make the {{sprintCountOrdinal}} idea!</span>
             <span v-if="!isIdeationTime">Take a breath...</span>
-            <i class="material-icons sound-switch" @click="switchSoundSetting">
-              {{soundOn? 'volume_up': 'volume_off'}}
-            </i>
+            <sound-switch :sound-on="soundOn" @switch-sound-setting="switchSoundSetting"></sound-switch>
           </h2>
           <h3 v-if="!isIdeationTime">{{remainingSprintCount > 1 ? remainingSprintCount + " ideas": remainingSprintCount + " idea"}} to go!</h3>
           <div class="countdown-timer">
@@ -78,6 +74,19 @@
       </div>
     </div>
     <script>
+      const soundSwitch = {
+        props: {
+          'sound-on': {
+            type: Boolean,
+            required: true,
+          },
+        },
+        template: `
+          <i class="material-icons sound-switch" @click="$emit('switch-sound-setting')">
+            {{soundOn? 'volume_up': 'volume_off'}}
+          </i>
+        `,
+      };
       const app = new Vue({
         el: '#app',
         data: {
@@ -174,7 +183,10 @@
             });
             this.pictureUrls = shuffle(urls);
           }
-        }
+        },
+        components: {
+          'sound-switch': soundSwitch,
+        },
       });
       const shuffle = function(array) {
         for (let i = array.length - 1; i > 0; i--) {
