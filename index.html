@@ -6,6 +6,9 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <!-- production version, optimized for size and speed -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+
+    <script src="https://cdn.jsdelivr.net/npm/vuelidate@0.7.3/dist/vuelidate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuelidate@0.7.3/dist/validators.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.15/howler.core.min.js"></script>
 
     <link rel="stylesheet" href="style.css">
@@ -21,36 +24,65 @@
           <span>Crazy {{maxSprintCount}}s Timer</span>
           <sound-switch :sound-on="soundOn" @switch-sound-setting="switchSoundSetting"></sound-switch>
         </h2>
-        <div class="input-area">
-          <div>
+        <div class="flex-column">
+          <div class="flex-row">
             <div class="input-box">
-              <p>
-                <input v-model.number="ideationSeconds" type="number"/>sec
-              </p>
-              <p>
-                <small>for </small><b>ideation</b>
-              </p>
+              <div class="error-container">
+                <div class="error-baloon" v-if="!$v.ideationSeconds.required || !$v.ideationSeconds.minValue || !$v.ideationSeconds.maxValue">
+                  <p v-if="!$v.ideationSeconds.required">This field is empty!</p>
+                  <p v-if="!$v.ideationSeconds.minValue">Is that enough!?</p>
+                  <p v-if="!$v.ideationSeconds.maxValue">Don't work too hard</p>
+                </div>
+              </div>
+              <div :class='{shake: !$v.ideationSeconds.required || !$v.ideationSeconds.minValue || !$v.ideationSeconds.maxValue}'>
+                <p class="underline">
+                  <input v-model.number="ideationSeconds" type="number"/>sec
+                </p>
+                <p>
+                  <small>for </small><b>ideation</b>
+                </p>
+              </div>
             </div>
             <div class="input-box">
-              <p>
-                <input v-model.number="breakSeconds" type="number"/>sec
-              </p>
-              <p>
-                <small>for a </small><b>break</b>
-              </p>
+              <div class="error-container">
+                <div class="error-baloon" v-if="!$v.breakSeconds.required || !$v.breakSeconds.minValue || !$v.breakSeconds.maxValue">
+                  <p v-if="!$v.breakSeconds.required">This field is empty!</p>
+                  <p v-if="!$v.breakSeconds.minValue">You should take a break</p>
+                  <p v-if="!$v.breakSeconds.maxValue">That's a little too long as a break</p>
+                </div>
+              </div>
+              <div :class='{shake: !$v.breakSeconds.required || !$v.breakSeconds.minValue || !$v.breakSeconds.maxValue}'>
+                <p class="underline">
+                  <input v-model.number="breakSeconds" type="number" />sec
+                </p>
+                <p>
+                  <small>for a </small><b>break</b>
+                </p>
+              </div>
             </div>  
           </div>
-          <div class="input-box">
-            <p>
-              <input v-model.number="maxSprintCount" type="number"/>
-            </p>
-            <p>
-              <b>times</b>
-            </p>
+          <div class="flex-row">
+            <div class="input-box">
+              <div class="error-container">
+                <div class="error-baloon" v-if="!$v.maxSprintCount.required || !$v.maxSprintCount.minValue || !$v.maxSprintCount.maxValue">
+                  <p v-if="!$v.maxSprintCount.required">This field is empty!</p>
+                  <p v-if="!$v.maxSprintCount.minValue">That's not crazy enough.</p>
+                  <p v-if="!$v.maxSprintCount.maxValue">That's tooooooo crazy!</p>
+                </div>
+              </div>
+              <div :class='{shake: !$v.maxSprintCount.required || !$v.maxSprintCount.minValue || !$v.maxSprintCount.maxValue}'>
+                <p class="underline">
+                  <input v-model.number="maxSprintCount" type="number"/>
+                </p>
+                <p>
+                  <b>times</b>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
         <div>
-          <button @click="start" class="start-button"><p>Start</p></button>
+          <button @click="start" class="start-button" :disabled="$v.$invalid"><p>Start</p></button>
         </div>
       </div>
       <div v-if="started" :class="['timer-page', isIdeationTime ? 'ideation-color' : 'break-color']">
@@ -74,6 +106,7 @@
       </div>
     </div>
     <script>
+      Vue.use(window.vuelidate.default);
       const soundSwitch = {
         props: {
           'sound-on': {
@@ -102,6 +135,23 @@
           soundOn: false,
           pictureUrls: [],
           nextPictureIndex: 0,
+        },
+        validations: {
+          maxSprintCount: {
+            required: validators.required,
+            minValue: validators.minValue(2),
+            maxValue: validators.maxValue(16)
+          },
+          ideationSeconds: {
+            required: validators.required,
+            minValue: validators.minValue(1),
+            maxValue: validators.maxValue(3600)
+          },
+          breakSeconds: {
+            required: validators.required,
+            minValue: validators.minValue(1),
+            maxValue: validators.maxValue(3600)
+          },
         },
         computed: {
           sprintCountOrdinal: function() {
