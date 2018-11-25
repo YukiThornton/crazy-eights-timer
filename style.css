@@ -102,7 +102,7 @@ button:disabled {
 	display: flex;
 	flex-flow: row nowrap;
 	justify-content: flex-start;
-	align-items: center;
+	align-items: stretch;
 	text-align: center;
 }
 
@@ -118,6 +118,14 @@ button:disabled {
 	flex-flow: row nowrap;
 	justify-content: center;
 	align-items: center;
+}
+
+.align-self-flex-start {
+	align-self: flex-start;
+}
+
+.flex-grow-bigger {
+	flex-grow: 1;
 }
 
 .error-container {
@@ -155,6 +163,33 @@ button:disabled {
     100% { transform: translate(1px, -2px) rotate(-1deg); }
 }
 
+.flash {
+	animation: flash linear 2s infinite;
+}
+
+@keyframes flash {
+	0% { opacity: 1; } 
+	50% { opacity: .4; } 
+	100% { opacity: 1; }
+}
+
+.count-status-icons {
+	text-align: left;
+	padding: 10px 10px 0;
+}
+
+.count-status-icons i {
+	margin: 0 15px;
+}
+
+.small-icon-font {
+	font-size: 20px;
+}
+
+.tiny-icon-font {
+	font-size: 10px;
+}
+
 .input-box {
 	display: inline-block;
 	margin: 10px;
@@ -185,4 +220,19 @@ button:disabled {
 
 img {
 	width: 100%;
+}
+
+@media only screen and (max-width: 600px) {
+	.timer-page-left {
+		width: 100%;
+	}
+	.timer-page-right {
+		width: 0;
+	}
+}
+
+@media only screen and (max-height: 350px) {
+	.remove-on-short-window {
+		visibility: hidden;
+	}
 }

@@ -11,6 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vuelidate@0.7.3/dist/validators.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.15/howler.core.min.js"></script>
 
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css?family=KoHo" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
@@ -86,18 +87,25 @@
         </div>
       </div>
       <div v-if="started" :class="['timer-page', isIdeationTime ? 'ideation-color' : 'break-color']">
-        <div class="timer-page-left">
-          <h2>
-            <span v-if="isIdeationTime">Make the {{sprintCountOrdinal}} idea!</span>
-            <span v-if="!isIdeationTime">Take a breath...</span>
-            <sound-switch :sound-on="soundOn" @switch-sound-setting="switchSoundSetting"></sound-switch>
-          </h2>
-          <h3 v-if="!isIdeationTime">{{remainingSprintCount > 1 ? remainingSprintCount + " ideas": remainingSprintCount + " idea"}} to go!</h3>
-          <div class="countdown-timer">
-            {{ remainingSeconds }}
+        <div class="timer-page-left flex-column">
+          <div class="count-status-icons align-self-flex-start">
+            <i class="far fa-lightbulb small-icon-font" v-for="n in (sprintCount - 1)"></i>
+            <i class="far fa-lightbulb small-icon-font" :class="{flash: isIdeationTime}"></i>
+            <i class="fas fa-asterisk tiny-icon-font" v-for="n in remainingSprintCount"></i>
           </div>
-          <div>
-            <button @click="stop" :class="isIdeationTime ? 'exit-button-ideation' : 'exit-button-break'"><p>Exit</p></button>
+          <div class="flex-grow-bigger flex-column">
+            <h2 class="remove-on-short-window">
+              <span v-if="isIdeationTime">Make the {{sprintCountOrdinal}} idea!</span>
+              <span v-if="!isIdeationTime">Take a breath...</span>
+              <sound-switch :sound-on="soundOn" @switch-sound-setting="switchSoundSetting"></sound-switch>
+            </h2>
+            <h3 v-if="!isIdeationTime" class="remove-on-short-window">{{remainingSprintCount > 1 ? remainingSprintCount + " ideas": remainingSprintCount + " idea"}} to go!</h3>
+            <div class="countdown-timer">
+              {{ remainingSeconds }}
+            </div>
+            <div>
+              <button @click="stop" :class="isIdeationTime ? 'exit-button-ideation' : 'exit-button-break'"><p>Exit</p></button>
+            </div>
           </div>
         </div>
         <div v-if="!isIdeationTime" class="timer-page-right">
